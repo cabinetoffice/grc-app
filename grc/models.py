@@ -1,12 +1,10 @@
 import os
 from datetime import datetime
 import enum
-import ast
 import jsonpickle
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy_utils import StringEncryptedType
 from sqlalchemy_utils.types.encrypted.encrypted_type import AesEngine
-from grc.business_logic.data_store_converter import convert_weakly_typed_to_strongly_typed
 from grc.business_logic.data_structures.application_data import ApplicationData
 
 db = SQLAlchemy()
@@ -39,12 +37,7 @@ class Application(db.Model):
     filesCreated = db.Column(db.Boolean, default=False)
 
     def application_data(self) -> ApplicationData:
-        try:
-            application_data_obj: ApplicationData = jsonpickle.decode(self.user_input)
-        except:
-            application_data_obj = convert_weakly_typed_to_strongly_typed(ast.literal_eval(self.user_input))
-
-        return application_data_obj
+        return jsonpickle.decode(self.user_input)
 
 
 class SecurityCode(db.Model):
